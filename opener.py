@@ -7,38 +7,65 @@ COMBINATION = (Key.shift, Key.ctrl)
 COM = None
 CODE = None
 DEVICE = None
-config = open(os.path.join(BASE_DIR, 'info.conf'), 'r')
 
+config = open(os.path.join(BASE_DIR, 'info.conf'), 'r')
 for line in config.read().split('\n'):
     if "PORT" in line.strip().upper():
-        COM = line.strip()[-4:]
+        COM = line.strip()[line.strip().upper().find('COM'):].upper()
     if "CODES" in line.strip().upper():
         codes_list = eval(line.strip()[-17:])
         CODE = chr(codes_list[0])
         for code in codes_list[1:]:
             CODE += chr(code)
+config.close()
 
-try:
-    DEVICE = serial.Serial(port = COM)
-except:
-    print('Could not Open Device')
+
+def open_device(com_to_open = COM):
+    try:
+        DEVICE = serial.Serial(port = com_to_open)
+    except Exception as e:
+        print('Could not Open Device :', e)
+
+open_device(COM)
+
+def update_new_com(new_com = COM):
+    config = open(os.path.join(BASE_DIR, 'info.conf'), 'r')
+    config_content = config.read().split('\n')
+    config.close()
+    config = open(os.path.join(BASE_DIR, 'info.conf'), 'w')
+    to_write = ''
+    for index, line in enumerate(config_content):
+        if "PORT" in line.upper():
+            to_write += 'PORT = ' + new_com
+        else:
+            to_write += line
+        if index < len(config_content)-1:
+            to_write += '\n'
+
+    config.write(to_write)
+    config.close()
 
 def open_cash_drawer():
+    global COM
     try:
+        if COM != window.com_input.text().strip():
+            COM = window.com_input.text().strip()
+            update_new_com(COM)
+            open_device(COM)
         DEVICE.write(CODE)
-    except: 
-        print('Error')
+    except Exception as e: 
+        print(e)
+        
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         self.button = QtWidgets.QPushButton('Open')
         self.button.clicked.connect(open_cash_drawer)
-        self.label = QtWidgets.QLabel()
-        self.label.setText('Port : ' + COM) 
-        
+        self.com_input = QtWidgets.QLineEdit(self)
+        self.com_input.setText(COM)
         layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self.label)
+        layout.addWidget(self.com_input)
         layout.addWidget(self.button)
 
 
@@ -68,10 +95,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     window = Window()
     window.setWindowTitle('Cash Drawer Opener')
-    window.setFixedSize(200,70)
+    window.setFixedSize(200,100)
     window.show()
     sys.exit(app.exec_())
-
-
-
 

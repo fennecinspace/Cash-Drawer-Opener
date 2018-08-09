@@ -3,11 +3,11 @@
 this is a simple python script to open a cash drawer connected by USB
 
 ## How to use  :
-Modify your COM number in info.conf, then launch `opener.py`
+launch `opener.py` and modify your COM number. 
 
-### Different Drawer :
+## Different Drawer :
 the default codes used for opening the cash drawer are the standard and should work for most drawers.<br>
-in case your drawer isn't opening when you're positive that the COM is correct, change the code to one of the following :
+in case your drawer isn't opening when you're positive that the COM is correct, change CODES in `info.conf` to one of the following :
 
     [27,112,0,25,250]
     [27,112,0,48,251]
@@ -24,3 +24,10 @@ in case your drawer isn't opening when you're positive that the COM is correct, 
     [27,112,0,25,251]
     [27,112,48,25,250]
 
+
+## Dependecies :
+install them using pip 
+
+    - PyQt5
+    - pyserial
+    - pynput
