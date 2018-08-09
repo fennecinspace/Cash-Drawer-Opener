@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets
 from pynput.keyboard import Key, Listener
 
 BASE_DIR = sys.path[0]
-COMBINATION = (Key.shift, Key.ctrl)
 COM = None
 CODE = None
 DEVICE = None
@@ -18,9 +17,10 @@ for line in config.read().split('\n'):
         for code in codes_list[1:]:
             CODE += chr(code)
 config.close()
-
+CODE = str.encode(CODE)
 
 def open_device(com_to_open = COM):
+    global DEVICE
     try:
         DEVICE = serial.Serial(port = com_to_open)
     except Exception as e:
@@ -58,6 +58,7 @@ def open_cash_drawer():
         
 
 class Window(QtWidgets.QWidget):
+
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
         self.button = QtWidgets.QPushButton('Open')
@@ -68,27 +69,35 @@ class Window(QtWidgets.QWidget):
         layout.addWidget(self.com_input)
         layout.addWidget(self.button)
 
+        ## minimize to tray
+        self.tray_icon = QtWidgets.QSystemTrayIcon(self)
+        self.tray_icon.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_ComputerIcon))
+        show_action = QtWidgets.QAction("Show", self)
+        quit_action = QtWidgets.QAction("Exit", self)
+        hide_action = QtWidgets.QAction("Hide", self)
+        show_action.triggered.connect(self.show)
+        hide_action.triggered.connect(self.hide)
+        quit_action.triggered.connect(QtWidgets.qApp.quit)
+        tray_menu = QtWidgets.QMenu()
+        tray_menu.addAction(show_action)
+        tray_menu.addAction(hide_action)
+        tray_menu.addAction(quit_action)
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+
 
 def on_press(key):
-    if key in COMBINATION:
-        pressed.add(key)
-        if all(k in pressed for k in COMBINATION):
-            open_cash_drawer()
+    if key == Key.f12:
+        open_cash_drawer()
 
-def on_release(key):
-    try:
-        pressed.clear()
-    except KeyError:
-        pass
 
 
 def create_listener():
-    with Listener(on_press = on_press, on_release = on_release) as listener:
+    with Listener(on_press = on_press, on_release = None) as listener:
         listener.join()
 
 ### Execution
 if __name__ == '__main__':
-    pressed = set()
     key_thread = threading.Thread(target = create_listener, daemon = True)
     key_thread.start()
 
@@ -98,4 +107,5 @@ if __name__ == '__main__':
     window.setFixedSize(200,100)
     window.show()
     sys.exit(app.exec_())
+
 
