@@ -1,6 +1,6 @@
 # USB Opener for POS Cash Drawer 
 
-this is a simple python script to open a cash drawer connected by USB
+this is a simple python script to open a cash drawer connected by USB (or using a USB adapter)
 
 ## How to use  :
 launch `opener.py` and modify your COM number. <br>
