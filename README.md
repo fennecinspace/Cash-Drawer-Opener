@@ -1,15 +1,28 @@
-# USB Opener for POS Cash Drawer 
+# USB Opener for POS Cash Drawer
 
 this is a simple python script to open a cash drawer connected by USB (or using a USB adapter)
 
-## How to use  :
+## Dependencies
+
+```bash
+sudo apt install python3 python3-pip
+sudo pip3 install PyQt5 pyserial pynput
+```
+
+## How to use
+
+```bash
+python3 opener.py
+```
+
 launch `opener.py` and modify your COM number. <br>
-Open Using <kbd>F12</kbd>
+Open Drawer Using <kbd>F12</kbd>
 
 ## Different Drawer :
 the default codes used for opening the cash drawer are the standard and should work for most drawers.<br>
 in case your drawer isn't opening when you're positive that the COM is correct, change CODES in `info.conf` to one of the following :
 
+```python
     [27,112,0,25,250]
     [27,112,0,48,251]
     [27,112,1,49,251]
@@ -24,11 +37,4 @@ in case your drawer isn't opening when you're positive that the COM is correct, 
     [27,70,0,50,50]
     [27,112,0,25,251]
     [27,112,48,25,250]
-
-
-## Dependecies :
-install them using pip 
-
-    - PyQt5
-    - pyserial
-    - pynput
+```
